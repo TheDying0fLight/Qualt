@@ -1,0 +1,89 @@
+[gd_scene load_steps=13 format=3 uid="uid://wlinv61j5nr4"]
+
+[ext_resource type="Shader" uid="uid://d2nh03vbwfnrs" path="res://plane.gdshader" id="1_f3sb7"]
+[ext_resource type="Script" uid="uid://k6hltm143vfu" path="res://world.gd" id="1_tlwt5"]
+[ext_resource type="Script" uid="uid://8s42e8agfws5" path="res://player.gd" id="2_fj7yv"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_f3sb7"]
+render_priority = 0
+shader = ExtResource("1_f3sb7")
+shader_parameter/gridColor = Color(0, 0, 0, 1)
+shader_parameter/checkerColor = Color(0, 0, 0, 1)
+shader_parameter/fadeStart = 0.0
+shader_parameter/fadeEnd = 10.0
+shader_parameter/unitSize = 1.0
+shader_parameter/subdivisions = 5
+shader_parameter/majorLineThickness = 2.0
+shader_parameter/minorLineThickness = 1.0
+shader_parameter/minorLineAlpha = 0.3
+shader_parameter/centerOffset = Vector3(0, 0, 0)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_fj7yv"]
+material = SubResource("ShaderMaterial_f3sb7")
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_f3sb7"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_fj7yv"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_f3sb7"]
+friction = 0.2
+bounce = 0.1
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_aqk2v"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_f3sb7"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_fj7yv"]
+
+[sub_resource type="SeparationRayShape3D" id="SeparationRayShape3D_tlwt5"]
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_tlwt5")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, 0.5, -0.5, 0, 0.707107, 0.707107, 0.707107, -0.5, 0.5, -2, 2, 2)
+
+[node name="StaticCamera" type="Camera3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(0.866025, -0.12941, 0.482963, 0, 0.965926, 0.258819, -0.5, -0.224144, 0.836516, 4, 3, 6)
+
+[node name="Grid" type="MeshInstance3D" parent="StaticCamera"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -0.06)
+mesh = SubResource("PlaneMesh_fj7yv")
+
+[node name="RigidBody3D" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 4, -6.54073)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
+shape = SubResource("CapsuleShape3D_f3sb7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D"]
+mesh = SubResource("CapsuleMesh_fj7yv")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+physics_material_override = SubResource("PhysicsMaterial_f3sb7")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("WorldBoundaryShape3D_aqk2v")
+
+[node name="RigidBody3D2" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+collision_layer = 0
+mass = 60.0
+script = ExtResource("2_fj7yv")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D2"]
+shape = SubResource("SphereShape3D_f3sb7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D2"]
+mesh = SubResource("SphereMesh_fj7yv")
+skeleton = NodePath("../CollisionShape3D")
+
+[node name="SpringArm3D" type="SpringArm3D" parent="RigidBody3D2"]
+shape = SubResource("SeparationRayShape3D_tlwt5")
+spring_length = 10.0
+
+[node name="PlayerCamera" type="Camera3D" parent="RigidBody3D2/SpringArm3D"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
