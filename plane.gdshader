@@ -12,9 +12,9 @@ uniform float minorLineThickness = 1.0;
 uniform float minorLineAlpha: hint_range(0.0, 1.0) = .3;
 uniform vec3 centerOffset = vec3(0.0, 0.0, 0.0);
 
-// calculate line mask, usning a bit of fwidth() magic to make line width not affected by perspective
+// calculate line mask, using a bit of fwidth() magic to make line width not affected by perspective
 float grid(vec2 pos, float unit, float thickness){
-	vec2 threshold = fwidth(pos) * thickness * .5 / unit;
+	vec2 threshold = fwidth(pos + vec2(100, 0)) * thickness * .5 / unit;
 	vec2 posWrapped = pos / unit;
 	vec2 line = step(fract(-posWrapped), threshold) + step(fract(posWrapped), threshold);
 	return max(line.x, line.y);
@@ -28,17 +28,17 @@ float checker(vec2 pos, float unit){
 }
 
 void fragment() {
-	// ray from camera to fragemnt in wrold space
-	vec3 rayWorld = normalize(mat3(INV_VIEW_MATRIX) * VIEW) ;
+	// ray from camera to fragment in world space
+	vec3 rayWorld = normalize(mat3(INV_VIEW_MATRIX) * VIEW);
 	
 	// calculate fragment position in world space
 	vec3 posWorld;
-	float t = -(CAMERA_POSITION_WORLD.y - centerOffset.y) / (rayWorld.y );
+	float t = -(CAMERA_POSITION_WORLD.y - centerOffset.y) / (rayWorld.y);
 	posWorld.y = -centerOffset.y;
-	posWorld.xz = CAMERA_POSITION_WORLD.xz + t * rayWorld.xz + centerOffset.xz;
+	posWorld.xz = CAMERA_POSITION_WORLD.xz + t * rayWorld.xz;
 	
 	// calculate planar distance from camera to fragment (used for fading) 
-	float distPlanar = distance(posWorld.xz, centerOffset.xz);
+	float distPlanar = max(distance(posWorld.x, centerOffset.x), distance(posWorld.z, centerOffset.z));
 	
 	// grid
 	float line = grid(posWorld.xz, unitSize, majorLineThickness);
@@ -64,5 +64,4 @@ void fragment() {
 
 	// final color (premultiplied alpha blend)
 	ALBEDO = (checkerColor.rgb * alphaChec) * (1.0 - alphaGrid) + (gridColor.rgb * alphaGrid);
-	
 }
