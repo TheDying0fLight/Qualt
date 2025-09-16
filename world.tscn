@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://wlinv61j5nr4"]
+[gd_scene load_steps=21 format=3 uid="uid://wlinv61j5nr4"]
 
 [ext_resource type="Shader" uid="uid://d2nh03vbwfnrs" path="res://plane.gdshader" id="1_f3sb7"]
 [ext_resource type="Script" uid="uid://k6hltm143vfu" path="res://world.gd" id="1_tlwt5"]
@@ -52,6 +52,10 @@ material = SubResource("StandardMaterial3D_pkg7o")
 
 [sub_resource type="SeparationRayShape3D" id="SeparationRayShape3D_tlwt5"]
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_036b0"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_dwbse"]
+
 [node name="Node3D" type="Node3D"]
 script = ExtResource("1_tlwt5")
 
@@ -96,6 +100,10 @@ shape = SubResource("SphereShape3D_f3sb7")
 mesh = SubResource("SphereMesh_fj7yv")
 skeleton = NodePath("../CollisionShape3D")
 
+[node name="PinJoint3D" type="PinJoint3D" parent="Player"]
+node_a = NodePath("..")
+node_b = NodePath("../../RigidBody3D2")
+
 [node name="PlayerCamArm" type="SpringArm3D" parent="." node_paths=PackedStringArray("target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
@@ -109,3 +117,15 @@ unique_name_in_owner = true
 
 [node name="CameraController" type="Node" parent="."]
 script = ExtResource("5_036b0")
+
+[node name="RigidBody3D2" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3045514, 0)
+mass = 30.0
+gravity_scale = -1.0
+linear_damp = 5.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D2"]
+shape = SubResource("BoxShape3D_036b0")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D2"]
+mesh = SubResource("BoxMesh_dwbse")
